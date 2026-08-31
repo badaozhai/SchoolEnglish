@@ -1,0 +1,8 @@
+<resources>
+    <color name="blue_700">#477DBB</color>
+    <color name="blue_900">#21456F</color>
+    <color name="teal_700">#5DA9A3</color>
+    <color name="surface">#EEF5F7</color>
+    <color name="glass">#EFFFFFFF</color>
+    <color name="glass_stroke">#55FFFFFF</color>
+</resources>

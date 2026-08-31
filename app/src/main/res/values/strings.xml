@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">英语随声听</string>
+    <string name="import_files">导入文件</string>
+    <string name="empty_title">还没有学习文件</string>
+    <string name="empty_subtitle">从 QQ 下载文件后，点击右上角导入</string>
+    <string name="playing">正在播放</string>
+</resources>
