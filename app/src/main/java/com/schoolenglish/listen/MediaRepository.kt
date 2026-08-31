@@ -55,8 +55,19 @@ class MediaRepository(private val context: Context) {
                         skipped += original
                         continue
                     }
-                    val name = File(original).name.replace(Regex("[^\\p{L}\\p{N}._ -]"), "_")
-                    val target = uniqueFile(File(mediaDir, name))
+                    val relativePath = original
+                        .replace('\\', '/')
+                        .split('/')
+                        .filter { it.isNotBlank() && it != "." }
+                    if (relativePath.any { it == ".." }) {
+                        skipped += original
+                        continue
+                    }
+                    val safePath = relativePath.joinToString(File.separator) {
+                        it.replace(Regex("[^\\p{L}\\p{N}._ -]"), "_")
+                    }
+                    val target = uniqueFile(File(mediaDir, safePath))
+                    target.parentFile?.mkdirs()
                     FileOutputStream(target).use { output -> archive.extractFile(header, output) }
                     imported++
                 }
