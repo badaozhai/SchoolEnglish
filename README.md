@@ -70,11 +70,13 @@
 - Android SDK 35
 - 可联网的 Gradle/Maven 依赖下载环境
 
-在 Android Studio 的 Gradle 面板运行 `app > Tasks > build > assembleDebug`。如果本机已经单独安装 Gradle，也可以在项目根目录运行：
+项目已提交 Gradle Wrapper（版本 8.7）。Windows 下可在项目根目录运行：
 
 ```bash
-gradle assembleDebug
+gradlew.bat assembleDebug
 ```
+
+也可以在 Android Studio 的 Gradle 面板运行 `app > Tasks > build > assembleDebug`。请在 `Settings > Build Tools > Gradle` 中将 Gradle JDK 设为 JDK 17。
 
 生成的调试 APK 通常位于：
 
