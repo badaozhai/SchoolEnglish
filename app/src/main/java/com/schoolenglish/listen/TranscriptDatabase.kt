@@ -86,7 +86,10 @@ class TranscriptDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, 
         fun flush() {
             val key = currentKey
             val text = pending.trim()
-            if (key != null && text.length >= 2) result.getOrPut(key) { mutableListOf() }.add(text)
+            if (key != null && text.length >= 2) {
+                result.getOrPut(key) { mutableListOf() }
+                    .addAll(TranscriptTextParser.splitSentences(text))
+            }
             pending = ""
         }
 
@@ -129,7 +132,7 @@ class TranscriptDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, 
         private const val DB_VERSION = 1
         private const val ASSET_NAME = "transcripts.pdf"
         private const val SEED_NAME = "pdf_seed"
-        private const val SEED_VERSION = "2026-08-31-v1"
+        private const val SEED_VERSION = "2026-08-31-v2"
 
         fun mediaKey(fileName: String): String? {
             val normalized = fileName.lowercase(Locale.ROOT)

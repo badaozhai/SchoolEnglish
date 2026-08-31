@@ -5,4 +5,15 @@
     <color name="surface">#EEF5F7</color>
     <color name="glass">#EFFFFFFF</color>
     <color name="glass_stroke">#55FFFFFF</color>
+    <color name="ic_launcher_background">#117C76</color>
+    <color name="player_teal_dark">#117C76</color>
+    <color name="player_coral">#EF6A5B</color>
+    <color name="player_time_text">#60758A</color>
+    <color name="player_progress_track">#D4E1E5</color>
+    <color name="player_progress_buffered">#91BEB9</color>
+    <color name="player_speed_text">#0B625E</color>
+    <color name="player_repeat_text">#9A4037</color>
+    <color name="player_overlay_text">#6F5600</color>
+    <color name="overlay_surface">#E8FFFFFF</color>
+    <color name="overlay_stroke">#CCFFFFFF</color>
 </resources>

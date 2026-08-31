@@ -1,7 +1,9 @@
 .gradle/
+.kotlin/
 build/
 captures/
 .idea/
 *.iml
 local.properties
 app/build/
+.DS_Store

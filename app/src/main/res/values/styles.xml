@@ -9,4 +9,14 @@
         <item name="strokeWidth">1dp</item>
         <item name="cardElevation">2dp</item>
     </style>
+
+    <style name="Widget.SchoolEnglish.PlayerAction" parent="Widget.Material3.Button.TonalButton">
+        <item name="android:minHeight">52dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:elevation">3dp</item>
+        <item name="android:stateListAnimator">@animator/player_button_elevation</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
 </resources>

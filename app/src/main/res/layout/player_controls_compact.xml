@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@id/exo_play_pause"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/player_play_button_background"
+            android:contentDescription="播放或暂停"
+            android:padding="10dp" />
+
+        <TextView
+            android:id="@id/exo_position"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:gravity="center"
+            android:textColor="@color/player_time_text"
+            android:textSize="12sp" />
+
+        <androidx.media3.ui.DefaultTimeBar
+            android:id="@id/exo_progress"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            app:bar_height="4dp"
+            app:buffered_color="@color/player_progress_buffered"
+            app:played_color="@color/player_teal_dark"
+            app:scrubber_color="@color/player_coral"
+            app:touch_target_height="36dp"
+            app:unplayed_color="@color/player_progress_track" />
+
+        <TextView
+            android:id="@id/exo_duration"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/player_time_text"
+            android:textSize="12sp" />
+    </LinearLayout>
+</merge>

@@ -43,4 +43,5 @@ dependencies {
     implementation("com.github.junrar:junrar:7.5.5")
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    testImplementation("junit:junit:4.13.2")
 }

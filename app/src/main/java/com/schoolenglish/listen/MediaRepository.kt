@@ -15,15 +15,19 @@ class MediaRepository(private val context: Context) {
     /** Copies the shipped lessons once so a fresh install is ready to use. */
     suspend fun installBundledMediaIfNeeded(): Int = withContext(Dispatchers.IO) {
         val marker = File(mediaDir, BUNDLED_MARKER)
-        if (marker.exists()) return@withContext 0
+        if (marker.takeIf { it.exists() }?.readText()?.trim() == BUNDLED_VERSION) return@withContext 0
 
         val assets = context.assets.list(BUNDLED_ASSET_DIR).orEmpty()
         var imported = 0
         assets.filter { mediaTypeFor(it) != null }.sorted().forEach { assetName ->
-            val target = uniqueFile(File(mediaDir, assetName))
+            val target = File(mediaDir, assetName)
+            if (target.exists()) return@forEach
+            val pending = File(mediaDir, ".$assetName.installing")
+            pending.delete()
             context.assets.open("$BUNDLED_ASSET_DIR/$assetName").use { input ->
-                FileOutputStream(target).use { output -> input.copyTo(output) }
+                FileOutputStream(pending).use { output -> input.copyTo(output) }
             }
+            check(pending.renameTo(target)) { "无法安装内置音频：$assetName" }
             imported++
         }
         marker.writeText(BUNDLED_VERSION)
