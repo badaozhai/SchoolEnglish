@@ -32,6 +32,7 @@ class TranscriptDatabase(context: Context) : SQLiteOpenHelper(context, DB_NAME, 
         onCreate(db)
     }
 
+    @Synchronized
     fun seedIfNeeded() {
         val db = writableDatabase
         val seeded = db.query("transcript_meta", arrayOf("value"), "name = ?", arrayOf(SEED_NAME), null, null, null).use { it.moveToFirst() && it.getString(0) == SEED_VERSION }
