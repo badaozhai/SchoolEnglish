@@ -12,6 +12,24 @@ import java.util.Locale
 class MediaRepository(private val context: Context) {
     private val mediaDir = File(context.filesDir, "media").apply { mkdirs() }
 
+    /** Copies the shipped lessons once so a fresh install is ready to use. */
+    suspend fun installBundledMediaIfNeeded(): Int = withContext(Dispatchers.IO) {
+        val marker = File(mediaDir, BUNDLED_MARKER)
+        if (marker.exists()) return@withContext 0
+
+        val assets = context.assets.list(BUNDLED_ASSET_DIR).orEmpty()
+        var imported = 0
+        assets.filter { mediaTypeFor(it) != null }.sorted().forEach { assetName ->
+            val target = uniqueFile(File(mediaDir, assetName))
+            context.assets.open("$BUNDLED_ASSET_DIR/$assetName").use { input ->
+                FileOutputStream(target).use { output -> input.copyTo(output) }
+            }
+            imported++
+        }
+        marker.writeText(BUNDLED_VERSION)
+        imported
+    }
+
     suspend fun listMedia(): List<MediaFile> = withContext(Dispatchers.IO) {
         mediaDir.walkTopDown()
             .filter { it.isFile && mediaTypeFor(it.name) != null }
@@ -98,6 +116,12 @@ class MediaRepository(private val context: Context) {
         "mp3" -> MediaType.AUDIO
         "mp4" -> MediaType.VIDEO
         else -> null
+    }
+
+    companion object {
+        private const val BUNDLED_ASSET_DIR = "preset_media"
+        private const val BUNDLED_MARKER = ".bundled_media_v1"
+        private const val BUNDLED_VERSION = "1"
     }
 }
 

@@ -14,7 +14,12 @@ class MediaViewModel(application: Application) : AndroidViewModel(application) {
     private val _files = MutableStateFlow<List<MediaFile>>(emptyList())
     val files: StateFlow<List<MediaFile>> = _files.asStateFlow()
 
-    init { refresh() }
+    init {
+        viewModelScope.launch {
+            runCatching { repository.installBundledMediaIfNeeded() }
+            _files.value = repository.listMedia()
+        }
+    }
 
     fun refresh() {
         viewModelScope.launch { _files.value = repository.listMedia() }
