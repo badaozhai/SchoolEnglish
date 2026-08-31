@@ -19,6 +19,8 @@ import androidx.media3.common.PlaybackParameters
 import androidx.media3.exoplayer.ExoPlayer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.schoolenglish.listen.databinding.ActivityMainBinding
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -26,6 +28,10 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MediaViewModel by viewModels()
     private lateinit var adapter: MediaFileAdapter
     private lateinit var player: ExoPlayer
+    private lateinit var transcriptAdapter: TranscriptAdapter
+    private val transcriptViewModel: TranscriptViewModel by viewModels()
+    private var transcriptLines: List<TranscriptLine> = emptyList()
+    private var lastTranscriptIndex = -1
     private var currentFiles: List<MediaFile> = emptyList()
     private var speedIndex = 1
     private var repeatMode = Player.REPEAT_MODE_OFF
@@ -54,6 +60,9 @@ class MainActivity : AppCompatActivity() {
         adapter = MediaFileAdapter(::play, ::showMore)
         binding.fileList.adapter = adapter
         binding.fileList.itemAnimator = null
+        transcriptAdapter = TranscriptAdapter()
+        binding.transcriptList.adapter = transcriptAdapter
+        binding.transcriptList.itemAnimator = null
         player = ExoPlayer.Builder(this).build()
         binding.audioControls.player = player
         binding.videoPlayer.player = player
@@ -68,6 +77,8 @@ class MainActivity : AppCompatActivity() {
                 binding.nowPlaying.text = file.file.name
                 binding.videoPlayer.visibility = if (file.type == MediaType.VIDEO) View.VISIBLE else View.GONE
                 binding.audioControls.visibility = if (file.type == MediaType.AUDIO) View.VISIBLE else View.GONE
+                binding.transcriptList.visibility = View.GONE
+                transcriptViewModel.loadFor(file.file.name)
             }
         })
         binding.speedButton.setOnClickListener {
@@ -101,6 +112,24 @@ class MainActivity : AppCompatActivity() {
                     adapter.submitList(it)
                     binding.emptyState.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
                     binding.fileList.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                transcriptViewModel.lines.collect {
+                    transcriptLines = it
+                    lastTranscriptIndex = -1
+                    transcriptAdapter.submitList(it)
+                    binding.transcriptList.visibility = if (it.isNotEmpty() && isCurrentAudio()) View.VISIBLE else View.GONE
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (isActive) {
+                    updateTranscriptPosition()
+                    delay(250)
                 }
             }
         }
@@ -146,6 +175,26 @@ class MainActivity : AppCompatActivity() {
         binding.nowPlaying.text = media.file.name
         binding.videoPlayer.visibility = if (media.type == MediaType.VIDEO) View.VISIBLE else View.GONE
         binding.audioControls.visibility = if (media.type == MediaType.AUDIO) View.VISIBLE else View.GONE
+        binding.transcriptList.visibility = View.GONE
+        transcriptViewModel.loadFor(media.file.name)
+    }
+
+    private fun isCurrentAudio(): Boolean {
+        val current = currentFiles.firstOrNull { it.file.absolutePath == player.currentMediaItem?.mediaId }
+        return current?.type == MediaType.AUDIO
+    }
+
+    private fun updateTranscriptPosition() {
+        if (!isCurrentAudio() || transcriptLines.isEmpty()) return
+        val duration = player.duration
+        if (duration <= 0L || duration == androidx.media3.common.C.TIME_UNSET) return
+        val index = ((player.currentPosition.toDouble() / duration) * transcriptLines.size)
+            .toInt()
+            .coerceIn(0, transcriptLines.lastIndex)
+        if (index == lastTranscriptIndex) return
+        lastTranscriptIndex = index
+        transcriptAdapter.setActiveIndex(index)
+        binding.transcriptList.smoothScrollToPosition(index)
     }
 
     private fun showMore(media: MediaFile) {
